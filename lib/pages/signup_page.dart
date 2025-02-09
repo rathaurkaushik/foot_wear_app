@@ -1,12 +1,10 @@
 import 'package:ecommere_app/controller/signup_controller.dart';
-import 'package:ecommere_app/pages/home_page.dart';
 import 'package:ecommere_app/pages/login_page.dart';
-import 'package:ecommere_app/widgets/OTP_FEILD.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SignupPage extends StatelessWidget {
-  const SignupPage({super.key});
+  SignupPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,74 +13,100 @@ class SignupPage extends StatelessWidget {
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
           child: Column(
-            spacing: 10,
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
+              /// **Title**
               Text(
                 'Create Your Account !!',
                 style: TextStyle(
+                  color: Colors.deepPurple,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30,
+                ),
+              ),
+              SizedBox(height: 10),
+
+              /// **Email Field**
+              TextField(
+                keyboardType: TextInputType.emailAddress,
+                controller: ctrl.emailController,
+                decoration: InputDecoration(
+                  hintText: 'Email Address',
+                  labelText: 'Email',
+                  suffixIcon: Icon(Icons.email),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+
+              /// **Password Field**
+              TextField(
+                keyboardType: TextInputType.visiblePassword,
+                controller: ctrl.passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  hintText: 'Password',
+                  labelText: 'Password',
+                  suffixIcon: Icon(Icons.lock),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+
+              /// **Confirm Password Field**
+              TextField(
+                keyboardType: TextInputType.visiblePassword,
+                controller: ctrl.confirmPasswordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  hintText: 'Confirm Password',
+                  labelText: 'Confirm Password',
+                  suffixIcon: Icon(Icons.lock_outline),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+
+              /// **Sign Up Button**
+              ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll(Colors.deepPurple),
+                ),
+                onPressed: () {
+                  ctrl.signUpWithEmail();
+                },
+                child: Text(
+                  'Sign Up',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 10),
+
+              /// **Login Navigation**
+              TextButton(
+                onPressed: () {
+                  Get.to(LoginPage());
+                },
+                child: Text(
+                  'Already have an account? Login',
+                  style: TextStyle(
+                    fontSize: 15,
                     color: Colors.deepPurple,
                     fontWeight: FontWeight.bold,
-                    fontSize: 30),
+                  ),
+                ),
               ),
-              SizedBox(
-                height: 10,
-              ),
-              TextField(
-                keyboardType: TextInputType.text,
-                controller: ctrl.nameController,
-                decoration: InputDecoration(
-                    hintText: 'Your Name',
-                    labelText: 'Your Name',
-                    suffixIcon: Icon(Icons.phone_android_outlined),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15))),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              TextField(
-                keyboardType: TextInputType.number,
-                controller: ctrl.numberController,
-                decoration: InputDecoration(
-                    hintText: 'Mobile Number',
-                    labelText: 'Mobile Number',
-                    suffixIcon: Icon(Icons.phone_android_outlined),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15))),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              OtpTextField(
-                otpController: ctrl.otpController,
-                visible: ctrl.visible,
-                onComplete: (otp) {
-                  ctrl.otpEnter = int.tryParse(otp);
-                },
-              ),
-              ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          WidgetStatePropertyAll(Colors.deepPurple)),
-                  onPressed: () {
-                    if (ctrl.visible) {
-                      ctrl.addUser();
-                    } else {
-                      ctrl.sendOtp();
-                    }
-                  },
-                  child: Text(
-                    ctrl.visible ? 'Verify' : 'Send OTP',
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  )),
-              TextButton(onPressed: (){
-                Get.to(LoginPage());
-              }, child: Text('Login',style: TextStyle(
-                fontSize: 15,
-                  color: Colors.deepPurple, fontWeight: FontWeight.bold),))
             ],
           ),
         ),

@@ -1,117 +1,70 @@
-import 'dart:math';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ecommere_app/model/user_model.dart';
+import 'package:ecommere_app/pages/home_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:otp_text_field_v2/otp_text_field_v2.dart';
 
 class SignupController extends GetxController {
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  late CollectionReference usersCollection;
+  FirebaseAuth auth = FirebaseAuth.instance;
 
-  TextEditingController nameController = TextEditingController();
-  TextEditingController numberController = TextEditingController();
-  OtpFieldControllerV2 otpController = OtpFieldControllerV2();
-  bool visible = false;
-  int? otpSend;
-  int? otpEnter;
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
+
 
   @override
-  void onInit() {
-    usersCollection = firestore.collection('users');
-    super.onInit();
+  void dispose() {
+    // TODO: implement dispose
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
   }
-  Future<void> addUser() async {
+
+
+  /// **Sign Up with Email & Password**
+  Future<void> signUpWithEmail() async {
     try {
-      // Validate OTP first
-      if (otpEnter != otpSend) {
+      String email = emailController.text.trim();
+      String password = passwordController.text.trim();
+      String confirmPassword = confirmPasswordController.text.trim();
+
+      if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
         Get.snackbar(
-          'Error', 'OTP is incorrect',
+          'Error', 'All fields are required',
           colorText: Colors.white,
           backgroundColor: Colors.red,
         );
         return;
       }
 
-      // Get a reference to a new document
-      DocumentReference doc = usersCollection.doc();
-
-      // Ensure number is valid before parsing
-      String numberText = numberController.text.trim();
-      int? parsedNumber = int.tryParse(numberText);
-
-      if (parsedNumber == null) {
+      if (password != confirmPassword) {
         Get.snackbar(
-          'Error', 'Invalid phone number',
+          'Error', 'Passwords do not match',
           colorText: Colors.white,
           backgroundColor: Colors.red,
         );
         return;
       }
 
-      // Create User object
-      User user = User(
-        id: doc.id,
-        name: nameController.text.trim(),
-        number: parsedNumber,
+      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
       );
 
-      // Convert to JSON and add to Firestore
-      final userJson = user.toJson();
-      await doc.set(userJson);
-
-      // Show success message
-      Get.snackbar(
-        'Success', 'User registered successfully',
-        colorText: Colors.white,
-        backgroundColor: Colors.green,
-      );
-
-      // Clear input fields after successful signup
-      nameController.clear();
-      numberController.clear();
-
+      if (userCredential.user != null) {
+        Get.to(HomePage());
+        Get.snackbar(
+          'Success', 'Account created successfully!',
+          colorText: Colors.white,
+          backgroundColor: Colors.green,
+        );
+      }
     } catch (e) {
-      // Handle and show error messages
       Get.snackbar(
-        'Error', 'Failed to register: ${e.toString()}',
+        'Error', 'Sign-up failed: ${e.toString()}',
         colorText: Colors.white,
         backgroundColor: Colors.red,
       );
     }
-  }
-
-  sendOtp(){
-    try {
-      if (nameController.text.isEmpty || numberController.text.isEmpty) {
-        Get.snackbar('Failed', 'Please fill all details',
-            colorText: Colors.white, backgroundColor: Colors.red);
-      }
-      else {
-        final random = Random();
-        int otp = 1000 + random.nextInt(9000);
-        print("My OTP "+otp.toString());
-        if (otp != null) {
-          visible = true;
-          otpSend = otp;
-          Get.snackbar(
-              'Success', 'Otp send successfully', colorText: Colors.white,
-              backgroundColor: Colors.green);
-        }
-        else {
-          Get.snackbar('Error', 'Otp not send !!', colorText: Colors.white,
-              backgroundColor: Colors.red);
-        }
-      }
-      }
-    catch (e) {
-      Get.snackbar('Error', e.toString(),
-          colorText: Colors.white, backgroundColor: Colors.red);
-    }finally{
-      update();
-    }
-
   }
 }
